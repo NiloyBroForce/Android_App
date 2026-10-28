@@ -30,7 +30,7 @@ class OnboardingPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Premium cars \nEnjoy",
+                    "Vehicle Rental App",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -39,7 +39,7 @@ class OnboardingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    "Premium and prestige cars tailored for you",
+                    "Easy Vehicle rental service tailored for you",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 16,

@@ -2,6 +2,7 @@ class Vehicle {
   final String? vehicleId;
   final String ownerId;
   final String model;
+  final String type;
   final double distance;
   final double fuelCapacity;
   final double pricePerHour;
@@ -14,6 +15,7 @@ class Vehicle {
     this.vehicleId,
     this.ownerId = '',
     required this.model,
+    this.type = 'car',
     required this.distance,
     required this.fuelCapacity,
     required this.pricePerHour,
@@ -28,6 +30,7 @@ class Vehicle {
       vehicleId: id ?? map['vehicleId'] ?? map['carId'],
       ownerId: map['ownerId'] ?? '',
       model: map['model'] ?? '',
+      type: map['type'] ?? 'car',
       distance: (map['distance'] as num?)?.toDouble() ?? 0.0,
       fuelCapacity: (map['fuelCapacity'] as num?)?.toDouble() ?? 0.0,
       pricePerHour: (map['pricePerHour'] as num?)?.toDouble() ?? (map['dailyRate'] as num?)?.toDouble() ?? 50.0,
@@ -42,6 +45,7 @@ class Vehicle {
     return {
       'ownerId': ownerId,
       'model': model,
+      'type': type,
       'distance': distance,
       'fuelCapacity': fuelCapacity,
       'pricePerHour': pricePerHour,

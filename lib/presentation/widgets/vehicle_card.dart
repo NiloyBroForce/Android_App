@@ -14,6 +14,13 @@ class VehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String assetPath = "assets/car_image.png";
+    if (vehicle.type.toLowerCase() == 'motorcycle') {
+      assetPath = "assets/motorcycle_image.png";
+    } else if (vehicle.type.toLowerCase() == 'bicycle') {
+      assetPath = "assets/bicycle_image.png";
+    }
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -36,9 +43,14 @@ class VehicleCard extends StatelessWidget {
             children: [
               Center(
                 child: Image.asset(
-                  "assets/car_image.png",
+                  assetPath,
                   height: 120,
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                    "assets/car_image.png",
+                    height: 120,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -63,10 +75,10 @@ class VehicleCard extends StatelessWidget {
                     label: '${vehicle.fuelCapacity.toStringAsFixed(0)} L',
                   ),
                   Text(
-                    '${vehicle.pricePerHour.toStringAsFixed(2)}/h',
+                    'BDT ${vehicle.pricePerHour.toStringAsFixed(0)}/h',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: 18,
                       color: Colors.white,
                     ),
                   ),

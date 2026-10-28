@@ -1,42 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_attend/core/utils/encryption_helper.dart';
 import 'package:flutter_attend/data/models/vehicle.dart';
 import 'package:flutter_attend/presentation/pages/MapsDetailsPage.dart';
 import 'package:flutter_attend/presentation/widgets/vehicle_card.dart';
 
-class CardDetailsPage extends StatefulWidget {
+class CardDetailsPage extends StatelessWidget {
   final Vehicle vehicle;
 
   const CardDetailsPage({super.key, required this.vehicle});
-
-  @override
-  State<CardDetailsPage> createState() => _CardDetailsPageState();
-}
-
-class _CardDetailsPageState extends State<CardDetailsPage> with SingleTickerProviderStateMixin {
-  AnimationController? _controller;
-  Animation<double>? _animation;
-
-  @override
-  void initState() {
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this
-    );
-
-    _animation = Tween<double>(begin: 1.0, end: 1.5).animate(_controller!)
-    ..addListener(() { setState(() {
-    }); });
-
-    _controller!.forward();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller!.forward();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +26,13 @@ class _CardDetailsPageState extends State<CardDetailsPage> with SingleTickerProv
         children: [
           VehicleCard(
             vehicle: Vehicle(
-              model: widget.vehicle.model,
-              distance: widget.vehicle.distance,
-              fuelCapacity: widget.vehicle.fuelCapacity,
-              pricePerHour: widget.vehicle.pricePerHour,
-              latitude: widget.vehicle.latitude,
-              longitude: widget.vehicle.longitude,
+              model: vehicle.model,
+              type: vehicle.type,
+              distance: vehicle.distance,
+              fuelCapacity: vehicle.fuelCapacity,
+              pricePerHour: vehicle.pricePerHour,
+              latitude: vehicle.latitude,
+              longitude: vehicle.longitude,
             ),
             onTap: () {},
           ),
@@ -82,13 +55,65 @@ class _CardDetailsPageState extends State<CardDetailsPage> with SingleTickerProv
                           )
                         ]
                     ),
-                    child: const Column(
-                      children: [
-                        CircleAvatar(radius: 40, backgroundImage: AssetImage('assets/user.png'),),
-                        SizedBox(height: 10,),
-                        Text('Jane Cooper',style: TextStyle(fontWeight: FontWeight.bold),),
-                        Text('\$4,253',style: TextStyle(color: Colors.grey),),
-                      ],
+                    child: FutureBuilder<DocumentSnapshot>(
+                      future: vehicle.ownerId.isNotEmpty
+                          ? FirebaseFirestore.instance.collection('users').doc(vehicle.ownerId).get()
+                          : null,
+                      builder: (context, snapshot) {
+                        String ownerName = 'Vehicle Owner';
+                        String ownerPhone = 'N/A';
+                        String ownerEmail = 'N/A';
+
+                        if (snapshot.hasData && snapshot.data != null && snapshot.data!.exists) {
+                          final data = snapshot.data!.data() as Map<String, dynamic>?;
+                          if (data != null) {
+                            ownerName = data['name'] ?? 'Vehicle Owner';
+                            ownerPhone = EncryptionHelper.decrypt(data['phone'] ?? 'N/A');
+                            ownerEmail = EncryptionHelper.decrypt(data['email'] ?? 'N/A');
+                          }
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              ownerName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.phone, size: 16, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    ownerPhone,
+                                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.email, size: 16, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    ownerEmail,
+                                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -98,7 +123,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> with SingleTickerProv
                     onTap: (){
                       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MapsDetailsPage(vehicle: widget.vehicle))
+                          MaterialPageRoute(builder: (context) => MapsDetailsPage(vehicle: vehicle))
                       );
                     },
                     child: Container(
@@ -115,10 +140,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> with SingleTickerProv
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: Transform.scale(
-                          scale: _animation!.value,
-                          alignment: Alignment.center,
-                          child: Image.asset('assets/maps.png',fit: BoxFit.cover,),
+                        child: Image.asset(
+                          'assets/maps.png',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),

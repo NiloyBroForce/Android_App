@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_attend/core/utils/encryption_helper.dart';
 import 'vehicle_list_screen.dart';
 import 'owner_home_screen.dart';
 
@@ -18,6 +19,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _firestore = FirebaseFirestore.instance;
 
   final _nameController = TextEditingController();
+  final _phoneController = TextEditingController(text: '+880');
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -35,6 +37,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _phoneController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -49,11 +52,12 @@ class _AuthScreenState extends State<AuthScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
 
-    if (email.isEmpty || password.isEmpty || (_isSignUp && name.isEmpty)) {
+    if (email.isEmpty || password.isEmpty || (_isSignUp && (name.isEmpty || phone.isEmpty || phone == '+880'))) {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Please fill in all fields.";
+        _errorMessage = "Please fill in all fields, including phone number.";
       });
       return;
     }
@@ -68,8 +72,10 @@ class _AuthScreenState extends State<AuthScreen> {
         if (credential.user != null) {
           await _firestore.collection('users').doc(credential.user!.uid).set({
             'name': name,
+            'phone': EncryptionHelper.encrypt(phone),
             'role': _selectedRole,
-            'email': email,
+            'email': EncryptionHelper.encrypt(email),
+            'password': EncryptionHelper.encrypt(password),
             'createdAt': FieldValue.serverTimestamp(),
           });
         }
@@ -224,6 +230,23 @@ class _AuthScreenState extends State<AuthScreen> {
                       borderSide: BorderSide.none,
                     ),
                     prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number (e.g. +8801XXXXXXXXX)',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[900],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: const Icon(Icons.phone, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
