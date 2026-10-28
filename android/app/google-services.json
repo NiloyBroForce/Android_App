@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "220665601768",
+    "project_id": "rental-321ef",
+    "storage_bucket": "rental-321ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220665601768:android:a8ba7b8e3cb9b1e0af335d",
+        "android_client_info": {
+          "package_name": "com.niloybroforce.rental"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSwVomjsCXIdSiFfHSMf_nTGzzFTZK6fY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
